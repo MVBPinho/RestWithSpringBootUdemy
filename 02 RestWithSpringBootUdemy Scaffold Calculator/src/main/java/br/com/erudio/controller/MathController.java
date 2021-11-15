@@ -1,5 +1,6 @@
 package br.com.erudio.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,58 +13,57 @@ import br.com.erudio.request.converters.NumberConverter;
 @RestController
 public class MathController {
 
-	@RequestMapping(value = "/sum/{numberOne}/{numberTwo}", method = RequestMethod.GET)
-	public Double sum(@PathVariable("numberOne") String numberOne, @PathVariable("numberTwo") String numberTwo)
-			throws Exception {
-		if (!NumberConverter.isNumeic(numberOne) || !NumberConverter.isNumeic(numberTwo)) {
-			throw new UnsuportedMathOperationException("Please set a numeric value!");
-		}
-		return SimpleMath.sum(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
+	@Autowired
+	private SimpleMath math;
 
+	@Autowired
+	private NumberConverter converter;
+
+	@RequestMapping(value = "/sum/{numberOne}/{numberTwo}", method = RequestMethod.GET)
+	public Double sum(@PathVariable("numberOne") String numberOne, @PathVariable("numberTwo") String numberTwo) {
+		validateInput(numberOne, numberTwo);
+		return math.sum(converter.convertToDouble(numberOne), converter.convertToDouble(numberTwo));
 	}
 
 	@RequestMapping(value = "/subtraction/{numberOne}/{numberTwo}", method = RequestMethod.GET)
-	public Double subtraction(@PathVariable("numberOne") String numberOne, @PathVariable("numberTwo") String numberTwo)
-			throws Exception {
-		if (!NumberConverter.isNumeic(numberOne) || !NumberConverter.isNumeic(numberTwo)) {
-			throw new UnsuportedMathOperationException("Please set a numeric value!");
-		}
-		return SimpleMath.subtraction(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
+	public Double subtraction(@PathVariable("numberOne") String numberOne,
+			@PathVariable("numberTwo") String numberTwo) {
+		validateInput(numberOne, numberTwo);
+		return math.subtraction(converter.convertToDouble(numberOne), converter.convertToDouble(numberTwo));
 	}
 
 	@RequestMapping(value = "/multiplication/{numberOne}/{numberTwo}", method = RequestMethod.GET)
 	public Double multiplication(@PathVariable("numberOne") String numberOne,
-			@PathVariable("numberTwo") String numberTwo) throws Exception {
-		if (!NumberConverter.isNumeic(numberOne) || !NumberConverter.isNumeic(numberTwo)) {
-			throw new UnsuportedMathOperationException("Please set a numeric value!");
-		}
-		return SimpleMath.multiplication(NumberConverter.convertToDouble(numberOne),
-				NumberConverter.convertToDouble(numberTwo));
+			@PathVariable("numberTwo") String numberTwo) {
+		validateInput(numberOne, numberTwo);
+		return math.multiplication(converter.convertToDouble(numberOne), converter.convertToDouble(numberTwo));
 	}
 
 	@RequestMapping(value = "/division/{numberOne}/{numberTwo}", method = RequestMethod.GET)
-	public Double division(@PathVariable("numberOne") String numberOne, @PathVariable("numberTwo") String numberTwo)
-			throws Exception {
-		if (!NumberConverter.isNumeic(numberOne) || !NumberConverter.isNumeic(numberTwo)) {
-			throw new UnsuportedMathOperationException("Please set a numeric value!");
-		}
-		return SimpleMath.division(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
+	public Double division(@PathVariable("numberOne") String numberOne, @PathVariable("numberTwo") String numberTwo) {
+		validateInput(numberOne, numberTwo);
+		return math.division(converter.convertToDouble(numberOne), converter.convertToDouble(numberTwo));
 	}
 
 	@RequestMapping(value = "/mean/{numberOne}/{numberTwo}", method = RequestMethod.GET)
-	public Double mean(@PathVariable("numberOne") String numberOne, @PathVariable("numberTwo") String numberTwo)
-			throws Exception {
-		if (!NumberConverter.isNumeic(numberOne) || !NumberConverter.isNumeic(numberTwo)) {
-			throw new UnsuportedMathOperationException("Please set a numeric value!");
-		}
-		return SimpleMath.mean(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
+	public Double mean(@PathVariable("numberOne") String numberOne, @PathVariable("numberTwo") String numberTwo) {
+		validateInput(numberOne, numberTwo);
+		return math.mean(converter.convertToDouble(numberOne), converter.convertToDouble(numberTwo));
 	}
 
 	@RequestMapping(value = "/squareRoot/{numberOne}", method = RequestMethod.GET)
 	public Double squareRoot(@PathVariable("numberOne") String number) throws Exception {
-		if (!NumberConverter.isNumeic(number)) {
+		validateInput(number);
+		return math.squareRoot(converter.convertToDouble(number));
+	}
+
+	private void validateInput(String number) {
+		if (!converter.isNumeic(number))
 			throw new UnsuportedMathOperationException("Please set a numeric value!");
-		}
-		return SimpleMath.squareRoot(NumberConverter.convertToDouble(number));
+	}
+
+	private void validateInput(String numberOne, String numberTwo) {
+		if (!converter.isNumeic(numberOne) || !converter.isNumeic(numberTwo))
+			throw new UnsuportedMathOperationException("Please set a numeric value!");
 	}
 }
